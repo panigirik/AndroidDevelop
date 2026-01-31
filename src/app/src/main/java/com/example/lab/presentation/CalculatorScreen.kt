@@ -4,23 +4,34 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.lab.domain.CalculatorAction
 import com.example.lab.domain.CalculatorOperation
+import com.example.lab.platform.performButtonFeedback
 
 @Composable
 fun CalculatorScreen(viewModel: CalculatorViewModel) {
 
     val state by viewModel.state.collectAsState()
 
+    // 🔹 Platform API access
+    val context = LocalContext.current
+    val view = LocalView.current
+
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
 
         Text(
-            text = state.number1 + (state.operation?.let { " ${symbol(it)} " } ?: "") + state.number2,
+            text = state.number1 +
+                    (state.operation?.let { " ${symbol(it)} " } ?: "") +
+                    state.number2,
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.End
@@ -30,28 +41,87 @@ fun CalculatorScreen(viewModel: CalculatorViewModel) {
 
         Column {
             Row {
-                CalcButton("7") { viewModel.onAction(CalculatorAction.Number(7)) }
-                CalcButton("8") { viewModel.onAction(CalculatorAction.Number(8)) }
-                CalcButton("9") { viewModel.onAction(CalculatorAction.Number(9)) }
-                CalcButton("÷") { viewModel.onAction(CalculatorAction.Operation(CalculatorOperation.Divide)) }
+                CalcButton("7") {
+                    performButtonFeedback(context, view)
+                    viewModel.onAction(CalculatorAction.Number(7))
+                }
+                CalcButton("8") {
+                    performButtonFeedback(context, view)
+                    viewModel.onAction(CalculatorAction.Number(8))
+                }
+                CalcButton("9") {
+                    performButtonFeedback(context, view)
+                    viewModel.onAction(CalculatorAction.Number(9))
+                }
+                CalcButton("÷") {
+                    performButtonFeedback(context, view)
+                    viewModel.onAction(
+                        CalculatorAction.Operation(CalculatorOperation.Divide)
+                    )
+                }
             }
+
             Row {
-                CalcButton("4") { viewModel.onAction(CalculatorAction.Number(4)) }
-                CalcButton("5") { viewModel.onAction(CalculatorAction.Number(5)) }
-                CalcButton("6") { viewModel.onAction(CalculatorAction.Number(6)) }
-                CalcButton("×") { viewModel.onAction(CalculatorAction.Operation(CalculatorOperation.Multiply)) }
+                CalcButton("4") {
+                    performButtonFeedback(context, view)
+                    viewModel.onAction(CalculatorAction.Number(4))
+                }
+                CalcButton("5") {
+                    performButtonFeedback(context, view)
+                    viewModel.onAction(CalculatorAction.Number(5))
+                }
+                CalcButton("6") {
+                    performButtonFeedback(context, view)
+                    viewModel.onAction(CalculatorAction.Number(6))
+                }
+                CalcButton("×") {
+                    performButtonFeedback(context, view)
+                    viewModel.onAction(
+                        CalculatorAction.Operation(CalculatorOperation.Multiply)
+                    )
+                }
             }
+
             Row {
-                CalcButton("1") { viewModel.onAction(CalculatorAction.Number(1)) }
-                CalcButton("2") { viewModel.onAction(CalculatorAction.Number(2)) }
-                CalcButton("3") { viewModel.onAction(CalculatorAction.Number(3)) }
-                CalcButton("-") { viewModel.onAction(CalculatorAction.Operation(CalculatorOperation.Subtract)) }
+                CalcButton("1") {
+                    performButtonFeedback(context, view)
+                    viewModel.onAction(CalculatorAction.Number(1))
+                }
+                CalcButton("2") {
+                    performButtonFeedback(context, view)
+                    viewModel.onAction(CalculatorAction.Number(2))
+                }
+                CalcButton("3") {
+                    performButtonFeedback(context, view)
+                    viewModel.onAction(CalculatorAction.Number(3))
+                }
+                CalcButton("-") {
+                    performButtonFeedback(context, view)
+                    viewModel.onAction(
+                        CalculatorAction.Operation(CalculatorOperation.Subtract)
+                    )
+                }
             }
+
             Row {
-                CalcButton("0") { viewModel.onAction(CalculatorAction.Number(0)) }
-                CalcButton(".") { viewModel.onAction(CalculatorAction.Decimal) }
-                CalcButton("=") { viewModel.onAction(CalculatorAction.Calculate) }
-                CalcButton("+") { viewModel.onAction(CalculatorAction.Operation(CalculatorOperation.Add)) }
+                CalcButton("0") {
+                    performButtonFeedback(context, view)
+                    viewModel.onAction(CalculatorAction.Number(0))
+                }
+                CalcButton(".") {
+                    performButtonFeedback(context, view)
+                    viewModel.onAction(CalculatorAction.Decimal)
+                }
+                CalcButton("=") {
+                    performButtonFeedback(context, view)
+                    viewModel.onAction(CalculatorAction.Calculate)
+                }
+                CalcButton("+") {
+                    performButtonFeedback(context, view)
+                    viewModel.onAction(
+                        CalculatorAction.Operation(CalculatorOperation.Add)
+                    )
+                }
             }
         }
     }
