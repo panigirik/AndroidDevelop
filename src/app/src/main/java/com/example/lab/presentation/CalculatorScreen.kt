@@ -130,7 +130,7 @@ private fun CalcButton(
     }
 }
 
-private fun symbol(operation: CalculatorOperation): String =
+fun symbol(operation: CalculatorOperation): String =
     when (operation) {
         CalculatorOperation.Add -> "+"
         CalculatorOperation.Subtract -> "-"

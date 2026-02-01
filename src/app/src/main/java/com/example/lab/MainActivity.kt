@@ -12,6 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.example.lab.data.history.HistoryRepository
 import com.example.lab.platform.PassKeyManager
 import com.example.lab.presentation.CalculatorScreen
 import com.example.lab.presentation.CalculatorViewModel
@@ -70,6 +73,16 @@ class MainActivity : FragmentActivity() {
                         }
 
                         CalculatorScreen(viewModel)
+                    }
+                }
+            }
+
+            val historyRepository = HistoryRepository()
+
+            val viewModel by viewModels<CalculatorViewModel> {
+                object : ViewModelProvider.Factory {
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        return CalculatorViewModel(historyRepository) as T
                     }
                 }
             }

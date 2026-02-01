@@ -7,6 +7,9 @@ import com.google.firebase.messaging.RemoteMessage
 class CalculatorMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
-        Log.d("FCM", "Message: ${message.notification?.title}")
+        val title = message.notification?.title ?: "Calculator"
+        val body = message.notification?.body ?: "New message"
+
+        Log.d("FCM", "Push received: $title - $body")
     }
 }
