@@ -5,27 +5,24 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.lab.domain.CalculatorAction
 import com.example.lab.domain.CalculatorOperation
-import com.example.lab.platform.performButtonFeedback
+import com.example.lab.platform.performHapticFeedback
+import com.example.lab.platform.playEqualsSound
 
 @Composable
 fun CalculatorScreen(viewModel: CalculatorViewModel) {
 
     val state by viewModel.state.collectAsState()
-
-    // 🔹 Platform API access
     val context = LocalContext.current
-    val view = LocalView.current
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.SpaceBetween
+        verticalArrangement = Arrangement.Top
     ) {
 
         Text(
@@ -33,97 +30,88 @@ fun CalculatorScreen(viewModel: CalculatorViewModel) {
                     (state.operation?.let { " ${symbol(it)} " } ?: "") +
                     state.number2,
             style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp),
             textAlign = TextAlign.End
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
         Column {
+
             Row {
-                CalcButton("7") {
-                    performButtonFeedback(context, view)
-                    viewModel.onAction(CalculatorAction.Number(7))
-                }
-                CalcButton("8") {
-                    performButtonFeedback(context, view)
-                    viewModel.onAction(CalculatorAction.Number(8))
-                }
-                CalcButton("9") {
-                    performButtonFeedback(context, view)
-                    viewModel.onAction(CalculatorAction.Number(9))
-                }
-                CalcButton("÷") {
-                    performButtonFeedback(context, view)
-                    viewModel.onAction(
-                        CalculatorAction.Operation(CalculatorOperation.Divide)
-                    )
+                CalcButton("C") {
+                    performHapticFeedback(context)
+                    viewModel.onAction(CalculatorAction.Clear)
                 }
             }
 
-            Row {
-                CalcButton("4") {
-                    performButtonFeedback(context, view)
-                    viewModel.onAction(CalculatorAction.Number(4))
-                }
-                CalcButton("5") {
-                    performButtonFeedback(context, view)
-                    viewModel.onAction(CalculatorAction.Number(5))
-                }
-                CalcButton("6") {
-                    performButtonFeedback(context, view)
-                    viewModel.onAction(CalculatorAction.Number(6))
-                }
-                CalcButton("×") {
-                    performButtonFeedback(context, view)
-                    viewModel.onAction(
-                        CalculatorAction.Operation(CalculatorOperation.Multiply)
-                    )
-                }
+            Spacer(Modifier.height(8.dp))
+
+            row(viewModel, "7", "8", "9", "÷") {
+                CalculatorAction.Operation(CalculatorOperation.Divide)
+            }
+
+            row(viewModel, "4", "5", "6", "×") {
+                CalculatorAction.Operation(CalculatorOperation.Multiply)
+            }
+
+            row(viewModel, "1", "2", "3", "-") {
+                CalculatorAction.Operation(CalculatorOperation.Subtract)
             }
 
             Row {
-                CalcButton("1") {
-                    performButtonFeedback(context, view)
-                    viewModel.onAction(CalculatorAction.Number(1))
-                }
-                CalcButton("2") {
-                    performButtonFeedback(context, view)
-                    viewModel.onAction(CalculatorAction.Number(2))
-                }
-                CalcButton("3") {
-                    performButtonFeedback(context, view)
-                    viewModel.onAction(CalculatorAction.Number(3))
-                }
-                CalcButton("-") {
-                    performButtonFeedback(context, view)
-                    viewModel.onAction(
-                        CalculatorAction.Operation(CalculatorOperation.Subtract)
-                    )
-                }
-            }
-
-            Row {
-                CalcButton("0") {
-                    performButtonFeedback(context, view)
-                    viewModel.onAction(CalculatorAction.Number(0))
-                }
+                numberButton("0", context, viewModel)
                 CalcButton(".") {
-                    performButtonFeedback(context, view)
+                    performHapticFeedback(context)
                     viewModel.onAction(CalculatorAction.Decimal)
                 }
                 CalcButton("=") {
-                    performButtonFeedback(context, view)
+                    performHapticFeedback(context)
+                    playEqualsSound()
                     viewModel.onAction(CalculatorAction.Calculate)
                 }
                 CalcButton("+") {
-                    performButtonFeedback(context, view)
+                    performHapticFeedback(context)
                     viewModel.onAction(
                         CalculatorAction.Operation(CalculatorOperation.Add)
                     )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun row(
+    viewModel: CalculatorViewModel,
+    n1: String,
+    n2: String,
+    n3: String,
+    op: String,
+    action: () -> CalculatorAction
+) {
+    val context = LocalContext.current
+
+    Row {
+        numberButton(n1, context, viewModel)
+        numberButton(n2, context, viewModel)
+        numberButton(n3, context, viewModel)
+        CalcButton(op) {
+            performHapticFeedback(context)
+            viewModel.onAction(action())
+        }
+    }
+}
+
+@Composable
+private fun numberButton(
+    text: String,
+    context: android.content.Context,
+    viewModel: CalculatorViewModel
+) {
+    CalcButton(text) {
+        performHapticFeedback(context)
+        viewModel.onAction(CalculatorAction.Number(text.toInt()))
     }
 }
 
@@ -136,7 +124,7 @@ private fun CalcButton(
         onClick = onClick,
         modifier = Modifier
             .padding(4.dp)
-            .size(80.dp)
+            .size(76.dp)
     ) {
         Text(text)
     }
