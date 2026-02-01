@@ -56,3 +56,15 @@ fun LabTheme(
         content = content
     )
 }
+
+private val LightColors = lightColorScheme()
+
+@Composable
+fun CalculatorTheme(
+    content: @Composable () -> Unit
+) {
+    MaterialTheme(
+        colorScheme = LightColors,
+        content = content
+    )
+}
