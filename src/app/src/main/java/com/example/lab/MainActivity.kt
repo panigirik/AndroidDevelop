@@ -20,42 +20,47 @@ import com.example.lab.presentation.CalculatorScreen
 import com.example.lab.presentation.CalculatorViewModel
 import com.example.lab.presentation.PassKeyScreen
 import com.example.lab.ui.theme.LabTheme
+import com.google.firebase.FirebaseApp
 
 class MainActivity : FragmentActivity() {
 
-    private val viewModel by viewModels<CalculatorViewModel>()
+    private val historyRepository = HistoryRepository()
 
-    private val passKeyManager by lazy {
-        PassKeyManager(this)
+    private val viewModel by viewModels<CalculatorViewModel> {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return CalculatorViewModel(historyRepository) as T
+            }
+        }
     }
+
+    private val passKeyManager by lazy { PassKeyManager(this) }
+
+    private var darkTheme by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         enableEdgeToEdge()
 
         setContent {
+            var isAuthorized by remember { mutableStateOf(false) }
 
-            var isAuthorized by remember {
-                mutableStateOf(passKeyManager.isPassKeySet())
+            LaunchedEffect(Unit) {
+                isAuthorized = passKeyManager.isPassKeySet().not()
             }
 
-            var darkTheme by remember { mutableStateOf(false) }
 
             LabTheme(darkTheme = darkTheme) {
+                Column(modifier = Modifier.fillMaxSize()) {
 
-                if (!isAuthorized) {
-                    PassKeyScreen(
-                        activity = this,
-                        passKeyManager = passKeyManager,
-                        onAuthenticated = {
-                            isAuthorized = true
-                        }
-                    )
-                } else {
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-
+                    if (!isAuthorized) {
+                        PassKeyScreen(
+                            activity = this@MainActivity,
+                            passKeyManager = passKeyManager,
+                            onAuthenticated = { isAuthorized = true }
+                        )
+                    } else {
                         // переключатель темы
                         Row(
                             modifier = Modifier
@@ -73,16 +78,6 @@ class MainActivity : FragmentActivity() {
                         }
 
                         CalculatorScreen(viewModel)
-                    }
-                }
-            }
-
-            val historyRepository = HistoryRepository()
-
-            val viewModel by viewModels<CalculatorViewModel> {
-                object : ViewModelProvider.Factory {
-                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        return CalculatorViewModel(historyRepository) as T
                     }
                 }
             }

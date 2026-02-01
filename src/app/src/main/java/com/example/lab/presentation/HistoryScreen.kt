@@ -18,8 +18,9 @@ fun HistoryScreen(
     var history by remember { mutableStateOf<List<HistoryItem>>(emptyList()) }
 
     LaunchedEffect(Unit) {
-        historyRepository.load {
-            history = it
+        // Правильный вызов метода
+        historyRepository.loadFromFirebase { loadedHistory ->
+            history = loadedHistory
         }
     }
 
